@@ -12,6 +12,8 @@ on a signage board or similiar without any interaction needed.
 
 ## This is not an official app and I can't make any guaranties regarding correctness and functionality. It is fully untested and was done purely out of interest!
 
+### Usage
+
 ```
 CWA Code Generator 0.1.0
 Folke 'joru' Gleumes <folke@gleumes.org>
@@ -25,10 +27,12 @@ FLAGS:
 
 OPTIONS:
         --address <address>                                            Event address
-        --default-checkin-time <default_check_in_length_in_minutes>    [default: 15]
+        --default-checkin-time <default_check_in_length_in_minutes>
+            the usual length people will spend at your event [default: 15]
+
         --description <description>                                    Event description
         --end-time <end-time>
-            end time of the event in ISO 8601
+            end time of the event formatted as %Y-%m-%d %H:%M
 
     -o, --output <FILE>
             Output location for the Qr code. If not provided the qr code will be printed to the
@@ -38,7 +42,7 @@ OPTIONS:
             Url from your countries  [default: https://e.coronawarn.app?v=1#]
 
         --start-time <start-time>
-            start time of the event in ISO 8601
+            start time of the event formatted as %Y-%m-%d %H:%M
 
         --type <INTEGER>
             LOCATION_TYPE_UNSPECIFIED = 0
