@@ -4,7 +4,7 @@ use clap::{App, Arg};
 pub const TIME_PARSE_STRING: &str = "%Y-%m-%d %H:%M";
 
 pub fn get_app() -> App<'static> {
-  App::new("CWA Code Generator")
+    App::new("CWA Code Generator")
     .version("0.1.0")
     .author("Folke 'joru' Gleumes <folke@gleumes.org>")
     .arg(
@@ -83,32 +83,55 @@ pub fn get_app() -> App<'static> {
       .takes_value(true)
       .validator(timedate)
     )
+    .arg(
+      Arg::new("dimensions")
+      .long("dimensions")
+      .about("dimensions of the resulting code image, i.e. '1000x1000'")
+      .takes_value(true)
+      .validator(dimensions)
+    )
+}
+
+fn dimensions(val: &str) -> Result<(), String> {
+    let dim: Vec<&str> = val.split("x").collect();
+    if dim.len() == 2 {
+        let h = dim.get(0).unwrap().parse::<u32>();
+        let w = dim.get(1).unwrap().parse::<u32>();
+
+        if h.is_ok() && w.is_ok() {
+            Ok(())
+        } else {
+            Err("failed to parse".to_owned())
+        }
+    } else {
+        Err("failed to parse".to_owned())
+    }
 }
 
 fn str_max_len(val: &str) -> Result<(), String> {
-  if val.len() <= 100 {
-    Ok(())
-  } else {
-    Err(String::from("can't be longer than 100 characters"))
-  }
+    if val.len() <= 100 {
+        Ok(())
+    } else {
+        Err(String::from("can't be longer than 100 characters"))
+    }
 }
 
 fn type_num(val: &str) -> Result<(), String> {
-  match val.to_string().parse::<u32>() {
-    Ok(val) => {
-      if val <= 12 {
-        Ok(())
-      } else {
-        Err("choose one of the provided types. You can get a list with --help".to_owned())
-      }
+    match val.to_string().parse::<u32>() {
+        Ok(val) => {
+            if val <= 12 {
+                Ok(())
+            } else {
+                Err("choose one of the provided types. You can get a list with --help".to_owned())
+            }
+        }
+        Err(_) => Err("has to be a valid number".to_owned()),
     }
-    Err(_) => Err("has to be a valid number".to_owned()),
-  }
 }
 
 fn timedate(val: &str) -> Result<(), String> {
-  match NaiveDateTime::parse_from_str(val, TIME_PARSE_STRING) {
-    Ok(_) => Ok(()),
-    Err(e) => Err(e.to_string()),
-  }
+    match NaiveDateTime::parse_from_str(val, TIME_PARSE_STRING) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
 }

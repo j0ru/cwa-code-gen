@@ -1,10 +1,11 @@
 use base64_url;
-use image::Luma;
 use prost::Message;
 use qrcode::QrCode;
 use rand::rngs::StdRng;
 use rand::RngCore;
 use rand::SeedableRng;
+use image::{ImageBuffer,Luma};
+
 
 mod cli;
 
@@ -96,10 +97,26 @@ fn main() {
     let mut link = prefix.to_owned();
     link.push_str(&base64_url::encode(&buf));
 
+    let dimensions: Option<Vec<u32>> = if let Some(dim) = matches.value_of("dimensions") {
+        Some(dim.split("x").map(|d| d.parse::<u32>().unwrap()).collect())
+    } else {
+        None
+    };
+
     let code = QrCode::new(link).unwrap();
     if let Some(output_path) = matches.value_of("output") {
-        let image = code.render::<Luma<u8>>().build();
-        image.save(output_path).unwrap();
+        let mut render = code.render::<Luma<u8>>();
+        if let Some(dim) = dimensions {
+            let width = dim.get(0).unwrap();
+            let height = dim.get(1).unwrap();
+            render.max_dimensions(width.clone(), width.clone());
+            let qrcode = render.build();
+            let mut image = ImageBuffer::from_pixel(width.clone(), height.clone(), Luma([255]));
+            image::imageops::overlay(&mut image, &qrcode, (width - qrcode.width()) / 2, (height - qrcode.height()) / 2);
+            image.save(output_path).unwrap();
+        } else {
+            render.build().save(output_path).unwrap();
+        }
     } else {
         let string = code.render().light_color(' ').dark_color('█').build();
         println!("{}", string);
