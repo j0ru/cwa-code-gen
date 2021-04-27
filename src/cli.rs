@@ -93,7 +93,7 @@ pub fn get_app() -> App<'static> {
 }
 
 fn dimensions(val: &str) -> Result<(), String> {
-    let dim: Vec<&str> = val.split("x").collect();
+    let dim: Vec<&str> = val.split('x').collect();
     if dim.len() == 2 {
         let h = dim.get(0).unwrap().parse::<u32>();
         let w = dim.get(1).unwrap().parse::<u32>();

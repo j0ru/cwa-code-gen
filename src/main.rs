@@ -1,11 +1,9 @@
-use base64_url;
+use image::{ImageBuffer, Luma};
 use prost::Message;
 use qrcode::QrCode;
 use rand::rngs::StdRng;
 use rand::RngCore;
 use rand::SeedableRng;
-use image::{ImageBuffer,Luma};
-
 
 mod cli;
 
@@ -74,9 +72,9 @@ fn main() {
     };
 
     let cwa_ld = items::CwaLocationData {
-        default_check_in_length_in_minutes: default_check_in_length_in_minutes,
+        default_check_in_length_in_minutes,
         version: 1,
-        r#type: r#type,
+        r#type,
     };
 
     let mut cwa_ld_buf = vec![];
@@ -98,7 +96,7 @@ fn main() {
     link.push_str(&base64_url::encode(&buf));
 
     let dimensions: Option<Vec<u32>> = if let Some(dim) = matches.value_of("dimensions") {
-        Some(dim.split("x").map(|d| d.parse::<u32>().unwrap()).collect())
+        Some(dim.split('x').map(|d| d.parse::<u32>().unwrap()).collect())
     } else {
         None
     };
@@ -109,10 +107,15 @@ fn main() {
         if let Some(dim) = dimensions {
             let width = dim.get(0).unwrap();
             let height = dim.get(1).unwrap();
-            render.max_dimensions(width.clone(), width.clone());
+            render.max_dimensions(*width, *width);
             let qrcode = render.build();
-            let mut image = ImageBuffer::from_pixel(width.clone(), height.clone(), Luma([255]));
-            image::imageops::overlay(&mut image, &qrcode, (width - qrcode.width()) / 2, (height - qrcode.height()) / 2);
+            let mut image = ImageBuffer::from_pixel(*width, *height, Luma([255]));
+            image::imageops::overlay(
+                &mut image,
+                &qrcode,
+                (width - qrcode.width()) / 2,
+                (height - qrcode.height()) / 2,
+            );
             image.save(output_path).unwrap();
         } else {
             render.build().save(output_path).unwrap();
