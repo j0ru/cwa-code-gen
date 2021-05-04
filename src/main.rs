@@ -107,7 +107,10 @@ fn main() {
         if let Some(dim) = dimensions {
             let width = dim.get(0).unwrap();
             let height = dim.get(1).unwrap();
-            render.max_dimensions(*width, *width);
+            {
+                let dim = if height > width { width } else { height };
+                render.max_dimensions(*dim, *dim);
+            }
             let qrcode = render.build();
             let mut image = ImageBuffer::from_pixel(*width, *height, Luma([255]));
             image::imageops::overlay(
